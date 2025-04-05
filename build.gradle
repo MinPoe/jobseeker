@@ -26,3 +26,18 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// create more specific test output feedback 
+test {
+    testLogging {
+        events "passed", "skipped", "failed" //, "standardOut", "standardError"
+
+        showExceptions true
+        exceptionFormat "full"
+        showCauses true
+        showStackTraces true
+
+        // verbose test output
+        showStandardStreams = false
+    }
+}

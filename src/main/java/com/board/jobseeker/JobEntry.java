@@ -10,7 +10,7 @@ import java.util.Optional;
 /// closeDate - the date at which the job application closes (OPTIONAL, some may not have)
 /// jobLocation - job location
 /// jobDuration - how long the job is (e.g. for internships), 0 for not specified (full-time)
-/// jobType - internship, part-time, full-time, etc.
+/// jobType - "Internship", "Part-time", "Full-time" 
 /// jobPay - compensation that the job provides per month (TENTATIVE)
 /// jobLink - link to job application
 public record JobEntry (String jobName, String companyName, LocalDate postDate, Optional<LocalDate> closeDate,
