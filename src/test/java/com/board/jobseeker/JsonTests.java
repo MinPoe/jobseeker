@@ -11,11 +11,11 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @JsonTest
-class APITests {
+class JsonTests {
     @Autowired
     private JacksonTester<JobEntry> jsonContainer;
 
-    // test correct SERIALIZATION (data stream --> object) of job object 
+    // test correct SERIALIZATION (data stream --> object) of job object (PASSING test)
     @Test
     void jobEntrySerializationTest() throws IOException{
         JobEntry job = new JobEntry(
@@ -24,14 +24,14 @@ class APITests {
             Optional.of(LocalDate.of(2025,4,20)),
             "Jakarta", 3,
             "Internship", 20,
-            "https://linkedin.com");
+            "https://linkedin.com", 1);
 
         // takes 'job' object and writes it in json format, asserting to expected perfect outcome
         // NOTE: checks every field 
         assertThat(jsonContainer.write(job)).isStrictlyEqualToJson("expected.json");
     }
 
-    // SERIALIZATION, test case 1: Optional closeDate empty (Passing Test)
+    // SERIALIZATION, test case 1: Optional closeDate empty (PASSING Test)
     @Test
     void jobEntrySerializationTest1() throws IOException{
         JobEntry job = new JobEntry(
@@ -40,13 +40,13 @@ class APITests {
             Optional.empty(),
             "Jakarta", 3,
             "Internship", 20,
-            "https://linkedin.com");
+            "https://linkedin.com", 1);
 
         // check that closeDate fields is empty
         assertThat(jsonContainer.write(job)).hasEmptyJsonPathValue("@.closeDate"); 
     }
 
-    // SERIALIZATION, test case 2: Data Mismatch (Failing Test)
+    // SERIALIZATION, test case 2: Data Mismatch (FAILING Test)
     @Test
     void jobEntrySerializationTest2() throws IOException{
         JobEntry job = new JobEntry(
@@ -55,12 +55,12 @@ class APITests {
             Optional.empty(),
             "Canada", 3,
             "Internship", 20,
-            "https://linkedin.com");
+            "https://linkedin.com", 1);
 
         assertThat(jsonContainer.write(job)).extractingJsonPathStringValue("@.jobLocation").isNotEqualTo("Jakarta");
     }
 
-    // test correct DESERIALIZATION (object --> data stream) of job object (JSON used for data stream)
+    // test correct DESERIALIZATION (object --> data stream) of job object (JSON used for data stream) (PASSING test)
     @Test 
     void jobEntryDeserializationTest() throws IOException{
         String expectedFields = """
@@ -73,7 +73,8 @@ class APITests {
                     "jobDuration": 4, 
                     "jobType": "Internship",
                     "jobPay": 24, 
-                    "jobLink": "https://jj-cafe-jobs.com"
+                    "jobLink": "https://jj-cafe-jobs.com",
+                    "jobID": 2
                 }
                 """;
 
@@ -81,11 +82,11 @@ class APITests {
             .isEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
                                     LocalDate.of(2025,4,20), Optional.of(LocalDate.of(2025,4,30)), 
                                     "Burnaby", 4, "Internship",
-                                    24, "https://jj-cafe-jobs.com"
+                                    24, "https://jj-cafe-jobs.com", 2
                                     ));
     }
 
-    // DESERIALIZATION, test case 1: failing test, jobPay mismatch 
+    // DESERIALIZATION, test case 1: jobPay mismatch (FAILING test) 
     @Test
     void jobEntryDeserializationTest1() throws IOException{
         String expectedFields = """
@@ -98,7 +99,8 @@ class APITests {
                     "jobDuration": 4, 
                     "jobType": "Internship",
                     "jobPay": 24, 
-                    "jobLink": "https://jj-cafe-jobs.com"
+                    "jobLink": "https://jj-cafe-jobs.com",
+                    "jobID": 2
                 }
                 """;
 
@@ -106,7 +108,7 @@ class APITests {
             .isNotEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
                                     LocalDate.of(2025,4,20), Optional.of(LocalDate.of(2025,4,30)), 
                                     "Burnaby", 4, "Internship",
-                                    23, "https://jj-cafe-jobs.com"
+                                    23, "https://jj-cafe-jobs.com", 2
                                     ));
     }
 }

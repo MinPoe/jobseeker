@@ -14,7 +14,7 @@ import java.util.Optional;
 /// jobPay - compensation that the job provides per month (TENTATIVE)
 /// jobLink - link to job application
 public record JobEntry (String jobName, String companyName, LocalDate postDate, Optional<LocalDate> closeDate,
-                        String jobLocation, int jobDuration, String jobType, int jobPay, String jobLink) {
+                        String jobLocation, int jobDuration, String jobType, int jobPay, String jobLink, int jobID) {
     public JobEntry {
         Objects.requireNonNull(jobName);
         Objects.requireNonNull(companyName);
@@ -22,5 +22,6 @@ public record JobEntry (String jobName, String companyName, LocalDate postDate, 
         Objects.requireNonNull(jobLocation);
         Objects.requireNonNull(jobType);
         Objects.requireNonNull(jobLink);
+        Objects.requireNonNull(jobID);
     }
 }
