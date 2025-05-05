@@ -11,9 +11,14 @@ import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDate;
+import java.util.Optional;
+import com.jayway.jsonpath.TypeRef;
+
 @SpringBootTest(
 	// start Spring boot application to allow for testing 
-	webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+	webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 class JobseekerAPITests {
 	// dependency injection (autowired) for test helper to aid in HTTP request creation 
 	@Autowired 
@@ -26,17 +31,28 @@ class JobseekerAPITests {
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		
-		// take JSON of response body, and parse to extract jobID field
+		// take JSON of response body and map every field to entries 
 		DocumentContext documentContext = JsonPath.parse(response.getBody()); 
-		int id = documentContext.read("@.jobID"); 
-		// assert that ID returned is expected
-		assertThat(id).isEqualTo(2); 
+
+		// create test variables 
+		LocalDate correct_postDate = LocalDate.of(2025,9,30); 
+		Optional<LocalDate> correct_closeDate = Optional.of(LocalDate.of(2025,12,31)); 
+
+		// assert that data returned is expected, testing only unique types, not all
+		assertThat(documentContext.read("$.jobID", Integer.class)).isEqualTo(2);
+		assertThat(documentContext.read("$.jobName", String.class)).isEqualTo("Firmware Testing"); 
+
+		LocalDate parsed_postDate = LocalDate.parse(documentContext.read("$.postDate",String.class));
+		Optional<LocalDate> parsed_closeDate = Optional.of(LocalDate.parse(documentContext.read("$.closeDate", String.class))); 
+
+		assertThat(parsed_postDate.equals(correct_postDate)); 
+		assertThat(parsed_closeDate.equals(correct_closeDate)); 
 	}
 
 	// when requested for an invalid job entry ID, should return HTTP status "404 NOT FOUND" (PASSING test)
 	@Test
 	void getUnknownJobEntry() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/99999999000010101010", String.class); 
+		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/0", String.class); 
 
 		// assert that the response is 404 and returns an empty body 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
