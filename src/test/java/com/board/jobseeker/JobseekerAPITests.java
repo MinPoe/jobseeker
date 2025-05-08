@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
-import java.util.Optional;
-import com.jayway.jsonpath.TypeRef;
+import java.net.URI;
+
 
 @SpringBootTest(
 	// start Spring boot application to allow for testing 
@@ -24,10 +24,11 @@ class JobseekerAPITests {
 	@Autowired 
 	TestRestTemplate restTemplate; 
 
-	// given an existing job entry, should be able to request 'get' the entry (PASSING test)
+	/// Request Type : GET 
+	/// Description : given an existing job entry, should be able to request 'get' the entry (PASSING test)
 	@Test
 	void getAvailableJobEntry() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/2", String.class); 
+		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/11", String.class); 
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		
@@ -36,20 +37,21 @@ class JobseekerAPITests {
 
 		// create test variables 
 		LocalDate correct_postDate = LocalDate.of(2025,9,30); 
-		Optional<LocalDate> correct_closeDate = Optional.of(LocalDate.of(2025,12,31)); 
+		LocalDate correct_closeDate = LocalDate.of(2025,12,31); 
 
 		// assert that data returned is expected, testing only unique types, not all
-		assertThat(documentContext.read("$.jobID", Integer.class)).isEqualTo(2);
+		assertThat(documentContext.read("$.jobID", Long.class)).isEqualTo(11L);
 		assertThat(documentContext.read("$.jobName", String.class)).isEqualTo("Firmware Testing"); 
 
 		LocalDate parsed_postDate = LocalDate.parse(documentContext.read("$.postDate",String.class));
-		Optional<LocalDate> parsed_closeDate = Optional.of(LocalDate.parse(documentContext.read("$.closeDate", String.class))); 
+		LocalDate parsed_closeDate = LocalDate.parse(documentContext.read("$.closeDate", String.class)); 
 
 		assertThat(parsed_postDate.equals(correct_postDate)); 
 		assertThat(parsed_closeDate.equals(correct_closeDate)); 
 	}
 
-	// when requested for an invalid job entry ID, should return HTTP status "404 NOT FOUND" (PASSING test)
+	/// Request Type : GET 
+	/// Description : when requested for an invalid job entry ID, should return HTTP status "404 NOT FOUND" (PASSING test)
 	@Test
 	void getUnknownJobEntry() {
 		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/0", String.class); 
@@ -59,4 +61,24 @@ class JobseekerAPITests {
 		assertThat(response.getBody()).isBlank(); 
 	}
 
+	/// Request Type : POST 
+	/// Description : non-failing POST request to API, database should update 
+	/// Expect : "201 CREATED", GET request to new resource location to be "200 OK" 
+	@Test
+	void createNewJobEntry() { 
+		LocalDate postDateEntry = LocalDate.parse("2025-01-30");
+		LocalDate closeDateEntry = LocalDate.parse("2025-05-30");
+		JobEntry newEntry = new JobEntry("Marketing Intern", "Meta", postDateEntry, closeDateEntry, "Texas", 4, "Internship", 12000, "https://meta.com", null); 
+
+		ResponseEntity<Void> responsePOST = restTemplate.postForEntity("/jobseeker", newEntry, Void.class); 
+
+		assertThat(responsePOST.getStatusCode()).isEqualTo(HttpStatus.CREATED); 
+
+		// the response should contain a header with the location of resource created 
+		URI jobEntryLocation = responsePOST.getHeaders().getLocation();
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(jobEntryLocation, String.class); 
+
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK); 
+
+	}
 }

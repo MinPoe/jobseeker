@@ -8,7 +8,6 @@ import org.springframework.boot.test.json.JacksonTester;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Optional;
 
 @JsonTest
 class JsonTests {
@@ -21,10 +20,10 @@ class JsonTests {
         JobEntry job = new JobEntry(
             "Software Developer Intern", "LinkedIn",
             LocalDate.of(2025,4,5),
-            Optional.of(LocalDate.of(2025,4,20)),
+            LocalDate.of(2025,4,20),
             "Jakarta", 3,
             "Internship", 20,
-            "https://linkedin.com", 1);
+            "https://linkedin.com", 10L);
 
         // takes 'job' object and writes it in json format, asserting to expected perfect outcome
         // NOTE: checks every field 
@@ -37,13 +36,13 @@ class JsonTests {
         JobEntry job = new JobEntry(
             "Software Developer Intern", "LinkedIn",
             LocalDate.of(2025,4,5),
-            Optional.empty(),
+            JobEntry.NO_CLOSE_DATE,
             "Jakarta", 3,
             "Internship", 20,
-            "https://linkedin.com", 1);
+            "https://linkedin.com", 10L);
 
         // check that closeDate fields is empty
-        assertThat(jsonContainer.write(job)).hasEmptyJsonPathValue("@.closeDate"); 
+        assertThat(jsonContainer.write(job)).extractingJsonPathStringValue("@.closeDate").isEqualTo(JobEntry.NO_CLOSE_DATE.toString()); 
     }
 
     // SERIALIZATION, test case 2: Data Mismatch (FAILING Test)
@@ -52,10 +51,10 @@ class JsonTests {
         JobEntry job = new JobEntry(
             "Software Developer Intern", "LinkedIn",
             LocalDate.of(2025,4,5),
-            Optional.empty(),
+            JobEntry.NO_CLOSE_DATE,
             "Canada", 3,
             "Internship", 20,
-            "https://linkedin.com", 1);
+            "https://linkedin.com", 10L);
 
         assertThat(jsonContainer.write(job)).extractingJsonPathStringValue("@.jobLocation").isNotEqualTo("Jakarta");
     }
@@ -74,15 +73,15 @@ class JsonTests {
                     "jobType": "Internship",
                     "jobPay": 24, 
                     "jobLink": "https://jj-cafe-jobs.com",
-                    "jobID": 2
+                    "jobID": 11
                 }
                 """;
 
         assertThat(jsonContainer.parse(expectedFields))
             .isEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
-                                    LocalDate.of(2025,4,20), Optional.of(LocalDate.of(2025,4,30)), 
+                                    LocalDate.of(2025,4,20), LocalDate.of(2025,4,30), 
                                     "Burnaby", 4, "Internship",
-                                    24, "https://jj-cafe-jobs.com", 2
+                                    24, "https://jj-cafe-jobs.com", 11L
                                     ));
     }
 
@@ -100,15 +99,15 @@ class JsonTests {
                     "jobType": "Internship",
                     "jobPay": 24, 
                     "jobLink": "https://jj-cafe-jobs.com",
-                    "jobID": 2
+                    "jobID": 11
                 }
                 """;
 
         assertThat(jsonContainer.parse(expectedFields))
             .isNotEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
-                                    LocalDate.of(2025,4,20), Optional.of(LocalDate.of(2025,4,30)), 
+                                    LocalDate.of(2025,4,20), LocalDate.of(2025,4,30), 
                                     "Burnaby", 4, "Internship",
-                                    23, "https://jj-cafe-jobs.com", 2
+                                    23, "https://jj-cafe-jobs.com", 11L
                                     ));
     }
 }

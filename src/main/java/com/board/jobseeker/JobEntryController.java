@@ -6,7 +6,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.util.UriComponentsBuilder;
+
 import java.util.Optional; 
+import java.net.URI; 
 
 @RestController  // allow for HTTP request handling 
 @RequestMapping("/jobseeker") // HTTP requests mapped to this are directed to this controller  
@@ -16,12 +21,17 @@ public class JobEntryController {
     // actual SQL stored in ~src/main/resources/schema.sql
     private final JobEntryRepository jobEntryRepository; 
 
-    /// handles requests mapped to /jobseeker/{requestedID} 
+    private JobEntryController(JobEntryRepository jobEntryRepository) {
+        this.jobEntryRepository = jobEntryRepository; 
+    }
+
+    /// Request Type : GET 
+    ///     handles GET requests mapped to /jobseeker/{requestedID} 
     /// returns: 
     ///     status - HTTP "200 OK"
     ///     response body - job entry data 
     @GetMapping("/{requestedID}")
-    private ResponseEntity<JobEntry> findById(@PathVariable int requestedID) {
+    private ResponseEntity<JobEntry> findById(@PathVariable Long requestedID) {
         // use path variable to match ID to data 
         Optional<JobEntry> jobEntry = jobEntryRepository.findById(requestedID); 
         
@@ -33,7 +43,21 @@ public class JobEntryController {
         }
     }   
 
-    private JobEntryController(JobEntryRepository jobEntryRepository) {
-        this.jobEntryRepository = jobEntryRepository; 
+    /// Request Type : POST 
+    ///     handles POST requests mapped to jobseeker/ 
+    /// returns: 
+    ///     status - HTTP "201 CREATED"
+    ///     response body - location header field of resource created 
+    @PostMapping
+    private ResponseEntity<Void> createJobEntry(@RequestBody JobEntry createdEntry, UriComponentsBuilder ucb) { 
+        JobEntry postedEntry = jobEntryRepository.save(createdEntry); 
+
+        URI postLocation = ucb
+                .path("jobseeker/{jobID}")
+                .buildAndExpand(postedEntry.jobID())
+                .toUri();
+        return ResponseEntity.created(postLocation).build();
     }
+
+    
 }

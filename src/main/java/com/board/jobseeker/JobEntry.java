@@ -1,7 +1,6 @@
 package com.board.jobseeker;
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.data.annotation.Id;
 
@@ -16,8 +15,12 @@ import org.springframework.data.annotation.Id;
 /// jobPay - compensation that the job provides per month (TENTATIVE)
 /// jobLink - link to job application
 /// jobID - unique numeric identifier for each job 
-public record JobEntry (String jobName, String companyName, LocalDate postDate, Optional<LocalDate> closeDate,
-                        String jobLocation, int jobDuration, String jobType, int jobPay, String jobLink, @Id int jobID) {
+public record JobEntry (String jobName, String companyName, LocalDate postDate, LocalDate closeDate, 
+                        String jobLocation, int jobDuration, String jobType, int jobPay, String jobLink, @Id Long jobID) {
+    
+    // CONSTANT anomalous value for NO_CLOSE_DATE
+    public static final LocalDate NO_CLOSE_DATE = LocalDate.of(9999, 12, 31); 
+
     public JobEntry {
         Objects.requireNonNull(jobName);
         Objects.requireNonNull(companyName);
@@ -28,6 +31,10 @@ public record JobEntry (String jobName, String companyName, LocalDate postDate, 
         Objects.requireNonNull(jobType);
         Objects.requireNonNull(jobPay); 
         Objects.requireNonNull(jobLink);
-        Objects.requireNonNull(jobID);
+    }
+
+    // Helper method for checking closeDate is valid
+    public boolean hasCloseDate() {
+        return !NO_CLOSE_DATE.equals(closeDate); 
     }
 }
