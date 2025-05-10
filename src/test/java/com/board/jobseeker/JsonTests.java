@@ -1,5 +1,7 @@
 package com.board.jobseeker;
 
+import org.assertj.core.util.Arrays; 
+import org.junit.jupiter.api.BeforeEach; 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
@@ -14,9 +16,38 @@ class JsonTests {
     @Autowired
     private JacksonTester<JobEntry> jsonContainer;
 
+    @Autowired 
+    private JacksonTester<JobEntry[]> jsonList; 
+
+    private JobEntry[] jobs; 
+
+    @BeforeEach 
+    void setUp() {
+        LocalDate postDate_1 = LocalDate.parse("2025-08-20"); 
+        LocalDate closeDate_1 = LocalDate.parse("2025-12-20"); 
+
+        LocalDate postDate_2 = LocalDate.parse("2025-09-30");
+        LocalDate closeDate_2 = LocalDate.parse("2025-12-31"); 
+
+        LocalDate postDate_3 = LocalDate.parse("2025-04-30"); 
+        LocalDate closeDate_3 = LocalDate.parse("2025-08-30");
+
+        jobs = Arrays.array(
+            new JobEntry("Software Engineering", "LinkedIn",postDate_1 ,closeDate_1,
+                        "Seattle", 4, "Internship", 3000, "https://linkedin.com", 20L), 
+
+            new JobEntry("Firmware Testing", "Nvidia", postDate_2,closeDate_2,
+                        "Santa Clara", 3, "Internship", 4000, "https://nvidia.careers.com", 21L),
+
+            new JobEntry("Hardware Testing", "Intel", postDate_3, closeDate_3,
+                        "Vancouver", 4, "Part-Time", 5000, "https://intel.careers.com", 22L) 
+        );
+    }
+
+
     // test correct SERIALIZATION (data stream --> object) of job object (PASSING test)
     @Test
-    void jobEntrySerializationTest() throws IOException{
+    void jobEntrySerializationTest() throws IOException {
         JobEntry job = new JobEntry(
             "Software Developer Intern", "LinkedIn",
             LocalDate.of(2025,4,5),
@@ -32,7 +63,7 @@ class JsonTests {
 
     // SERIALIZATION, test case 1: Optional closeDate empty (PASSING Test)
     @Test
-    void jobEntrySerializationTest1() throws IOException{
+    void jobEntrySerializationTest1() throws IOException {
         JobEntry job = new JobEntry(
             "Software Developer Intern", "LinkedIn",
             LocalDate.of(2025,4,5),
@@ -47,7 +78,7 @@ class JsonTests {
 
     // SERIALIZATION, test case 2: Data Mismatch (FAILING Test)
     @Test
-    void jobEntrySerializationTest2() throws IOException{
+    void jobEntrySerializationTest2() throws IOException {
         JobEntry job = new JobEntry(
             "Software Developer Intern", "LinkedIn",
             LocalDate.of(2025,4,5),
@@ -61,11 +92,11 @@ class JsonTests {
 
     // test correct DESERIALIZATION (object --> data stream) of job object (JSON used for data stream) (PASSING test)
     @Test 
-    void jobEntryDeserializationTest() throws IOException{
+    void jobEntryDeserializationTest() throws IOException {
         String expectedFields = """
                 {
                     "jobName": "Marketing Intern",
-                    "companyName": "JJ Cafe", 
+                    "companyName": "Uno Cafe", 
                     "postDate": "2025-04-20",
                     "closeDate": "2025-04-30",
                     "jobLocation": "Burnaby",
@@ -78,7 +109,7 @@ class JsonTests {
                 """;
 
         assertThat(jsonContainer.parse(expectedFields))
-            .isEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
+            .isEqualTo(new JobEntry("Marketing Intern", "Uno Cafe", 
                                     LocalDate.of(2025,4,20), LocalDate.of(2025,4,30), 
                                     "Burnaby", 4, "Internship",
                                     24, "https://jj-cafe-jobs.com", 11L
@@ -87,7 +118,7 @@ class JsonTests {
 
     // DESERIALIZATION, test case 1: jobPay mismatch (FAILING test) 
     @Test
-    void jobEntryDeserializationTest1() throws IOException{
+    void jobEntryDeserializationTest1() throws IOException {
         String expectedFields = """
                 {
                     "jobName": "Marketing Intern",
@@ -109,5 +140,63 @@ class JsonTests {
                                     "Burnaby", 4, "Internship",
                                     23, "https://jj-cafe-jobs.com", 11L
                                     ));
+    }
+
+    // LISTS
+    // test correct SERIALIZATION 
+    @Test
+    void jobEntryListSerializationTest() throws IOException {
+
+        assertThat(jsonList.write(jobs)).isStrictlyEqualToJson("list.json"); 
+    }
+
+
+    // test correct DESERIALIZATION 
+    @Test
+    void jobEntryListDeserializationTest() throws IOException {
+        String expectedList = """
+                [
+                    {
+                        "jobName": "Software Engineering",
+                        "companyName": "LinkedIn",
+                        "postDate": "2025-08-20",
+                        "closeDate": "2025-12-20",
+                        "jobLocation": "Seattle",
+                        "jobDuration": 4,
+                        "jobType": "Internship",
+                        "jobPay": 3000,
+                        "jobLink": "https://linkedin.com",
+                        "jobID": 20
+                    },
+
+                    {
+                        "jobName": "Firmware Testing",
+                        "companyName": "Nvidia",
+                        "postDate": "2025-09-30",
+                        "closeDate": "2025-12-31",
+                        "jobLocation": "Santa Clara",
+                        "jobDuration": 3,
+                        "jobType": "Internship",
+                        "jobPay": 4000,
+                        "jobLink": "https://nvidia.careers.com",
+                        "jobID": 21
+                    },
+
+                    {
+                        "jobName": "Hardware Testing",
+                        "companyName": "Intel",
+                        "postDate": "2025-04-30",
+                        "closeDate": "2025-08-30",
+                        "jobLocation": "Vancouver",
+                        "jobDuration": 4,
+                        "jobType": "Part-Time",
+                        "jobPay": 5000,
+                        "jobLink": "https://intel.careers.com",
+                        "jobID": 22
+                    }
+                ]
+                """;
+
+                assertThat(jsonList.parse(expectedList)).isEqualTo(jobs); 
     }
 }

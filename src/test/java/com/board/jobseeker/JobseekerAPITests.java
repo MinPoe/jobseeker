@@ -2,22 +2,29 @@ package com.board.jobseeker;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray; 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.net.URI;
 
+import static org.springframework.test.annotation.DirtiesContext.*;
 
 @SpringBootTest(
 	// start Spring boot application to allow for testing 
 	webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
+
+@DirtiesContext(
+	classMode = ClassMode.AFTER_EACH_TEST_METHOD
 )
 class JobseekerAPITests {
 	// dependency injection (autowired) for test helper to aid in HTTP request creation 
@@ -28,7 +35,7 @@ class JobseekerAPITests {
 	/// Description : given an existing job entry, should be able to request 'get' the entry (PASSING test)
 	@Test
 	void getAvailableJobEntry() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/11", String.class); 
+		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/21", String.class); 
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		
@@ -40,7 +47,7 @@ class JobseekerAPITests {
 		LocalDate correct_closeDate = LocalDate.of(2025,12,31); 
 
 		// assert that data returned is expected, testing only unique types, not all
-		assertThat(documentContext.read("$.jobID", Long.class)).isEqualTo(11L);
+		assertThat(documentContext.read("$.jobID", Long.class)).isEqualTo(21L);
 		assertThat(documentContext.read("$.jobName", String.class)).isEqualTo("Firmware Testing"); 
 
 		LocalDate parsed_postDate = LocalDate.parse(documentContext.read("$.postDate",String.class));
@@ -80,5 +87,14 @@ class JobseekerAPITests {
 
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody()); 
+		Number id = documentContext.read("$.jobID"); 
+		Integer jobPay = documentContext.read("$.jobPay"); 
+
+		assertThat(id).isNotNull(); 
+		assertThat(jobPay).isEqualTo(12000);
+
 	}
+
+
 }

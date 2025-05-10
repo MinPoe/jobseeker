@@ -1,0 +1,40 @@
+[
+    {
+        "jobName": "Software Engineering",
+        "companyName": "LinkedIn",
+        "postDate": "2025-08-20",
+        "closeDate": "2025-12-20",
+        "jobLocation": "Seattle",
+        "jobDuration": 4,
+        "jobType": "Internship",
+        "jobPay": 3000,
+        "jobLink": "https://linkedin.com",
+        "jobID": 20
+    },
+
+    {
+        "jobName": "Firmware Testing",
+        "companyName": "Nvidia",
+        "postDate": "2025-09-30",
+        "closeDate": "2025-12-31",
+        "jobLocation": "Santa Clara",
+        "jobDuration": 3,
+        "jobType": "Internship",
+        "jobPay": 4000,
+        "jobLink": "https://nvidia.careers.com",
+        "jobID": 21
+    },
+
+    {
+        "jobName": "Hardware Testing",
+        "companyName": "Intel",
+        "postDate": "2025-04-30",
+        "closeDate": "2025-08-30",
+        "jobLocation": "Vancouver",
+        "jobDuration": 4,
+        "jobType": "Part-Time",
+        "jobPay": 5000,
+        "jobLink": "https://intel.careers.com",
+        "jobID": 22
+    }
+]
