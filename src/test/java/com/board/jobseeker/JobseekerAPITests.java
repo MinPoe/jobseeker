@@ -2,7 +2,9 @@ package com.board.jobseeker;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray; 
+import net.minidev.json.JSONArray;
+
+import org.h2.jmx.DocumentedMBean;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,10 +23,6 @@ import static org.springframework.test.annotation.DirtiesContext.*;
 @SpringBootTest(
 	// start Spring boot application to allow for testing 
 	webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-)
-
-@DirtiesContext(
-	classMode = ClassMode.AFTER_EACH_TEST_METHOD
 )
 class JobseekerAPITests {
 	// dependency injection (autowired) for test helper to aid in HTTP request creation 
@@ -68,9 +66,78 @@ class JobseekerAPITests {
 		assertThat(response.getBody()).isBlank(); 
 	}
 
+	/// Request Type : GET 
+	/// Description : when requested for list of job entry that exists, should return 
+	@Test 
+	void getJobEntryList() {
+		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker", String.class); 
+ 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
+
+		DocumentContext documentContext = JsonPath.parse(response.getBody()); 
+		int jobEntryCount = documentContext.read("$.length()"); 
+		assertThat(jobEntryCount).isEqualTo(3); 
+
+		JSONArray jobIDs = documentContext.read("$..jobID");
+		assertThat(jobIDs).containsExactlyInAnyOrder(20, 21, 22);
+
+		JSONArray jobPays = documentContext.read("$..jobPay"); 
+		assertThat(jobPays).containsExactlyInAnyOrder(3000, 4000, 5000); 
+
+
+
+	}
+
+	/// Request Type : GET 
+	/// Description : when requested for page of existing job entries, return successfully 
+	@Test
+	void getPageOfJobEntries() {
+		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker?page=0&size=1", String.class); 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
+
+		DocumentContext documentContext = JsonPath.parse(response.getBody());
+		JSONArray page = documentContext.read("$[*]"); 
+		assertThat(page.size()).isEqualTo(1); 
+	}
+
+	/// Request Type : GET 
+	/// Description : when requested for page of existing job entries with descending order, return successfully
+	@Test
+	void getSortedPageOfJobEntries() {
+		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker?page=0&size=1&sort=jobID,desc", String.class); 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
+
+		DocumentContext documentContext = JsonPath.parse(response.getBody());
+		JSONArray page = documentContext.read("$[*]"); 
+		assertThat(page.size()).isEqualTo(1); 
+
+		// expected result returns jobID 22, with jobPay 5000 
+		int jobPay = documentContext.read("$[0].jobPay"); 
+		assertThat(jobPay).isEqualTo(5000);
+	}
+
+	/// Request Type : GET 
+	/// Description : correct GET request for page of job entries, PARAMETERS MISSING (test for default)
+	/// Expect : "200 OK", default sorting should be ascending order of jobID
+	@Test
+	void getDefaultPageOfJobEntries() {
+		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker", String.class); 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
+
+		DocumentContext documentContext = JsonPath.parse(response.getBody());
+		JSONArray page = documentContext.read("$[*]"); 
+		assertThat(page.size()).isEqualTo(3); 
+
+		// expected result returns jobID 22, with jobPay 5000 
+		JSONArray jobPays = documentContext.read("$..jobPay"); 
+		assertThat(jobPays).containsExactly(3000,4000,5000);
+	}
+
 	/// Request Type : POST 
 	/// Description : non-failing POST request to API, database should update 
 	/// Expect : "201 CREATED", GET request to new resource location to be "200 OK" 
+	/// NOTE : creates new job entry, needs @DirtiesContext
+	@DirtiesContext
 	@Test
 	void createNewJobEntry() { 
 		LocalDate postDateEntry = LocalDate.parse("2025-01-30");
@@ -95,6 +162,12 @@ class JobseekerAPITests {
 		assertThat(jobPay).isEqualTo(12000);
 
 	}
+
+	
+
+
+
+	
 
 
 }
