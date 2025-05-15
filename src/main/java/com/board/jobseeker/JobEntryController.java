@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -84,5 +85,36 @@ public class JobEntryController {
             return ResponseEntity.notFound().build();
         }
     }   
+
+    /// Request Type : PUT 
+    ///     handles PUT requests mapped to /jobseeker/{requestedID}
+    /// returns: 
+    ///     status - HTTP "204 NO_CONTENT"
+    ///     response body - empty 
+    @PutMapping("/{requestedID}")
+    private ResponseEntity<Void> putJobEntry(@PathVariable Long requestedID, @RequestBody JobEntry update, Principal principal) {
+        // TODO: REPLACE if(owner.equals()) test with findByIdAndOwner() method to automatically check if id and owner match
+        Optional<JobEntry> jobEntry = jobEntryRepository.findById(requestedID); 
+
+        if (jobEntry.isPresent()) {
+            JobEntry jobEntryToUpdate = jobEntry.get(); 
+            
+            if (jobEntryToUpdate.owner().equals(principal.getName())) {
+                JobEntry updatedJobEntry = new JobEntry(update.jobName(), update.companyName(), update.postDate(), update.closeDate(), update.jobLocation(), update.jobDuration(), update.jobType(), update.jobPay(), update.jobLink(), jobEntryToUpdate.jobID(), principal.getName()); 
+                jobEntryRepository.save(updatedJobEntry); 
+
+                return ResponseEntity.noContent().build();
+            }
+
+            else { 
+                // upon non-existent IDs or unauthorized PUT requests, return ambiguous "404 NOT FOUND" to conceal information 
+                return ResponseEntity.notFound().build(); 
+            }
+        }
+
+        else {
+            return ResponseEntity.notFound().build(); 
+        }
+    }
 
 }

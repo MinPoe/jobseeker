@@ -11,6 +11,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.http.HttpEntity; 
+import org.springframework.http.HttpMethod;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -177,11 +179,61 @@ class JobseekerAPITests {
 
 	}
 
-	
+	/// Request Type : PUT 
+	/// Description : non-failing PUT request, specified record should update with new job entry record 
+	/// Expect : "204 NO_CONTENT", GET request comparison should contain new value 
+	/// NOTE : needs @DirtiesContext, also requires correct owner of jobEntry for permission 
+	@DirtiesContext 
+	@Test
+	void putReplaceJobEntryField() {
+		JobEntry jobEntryUpdate = new JobEntry("Machine Testing", "LinkedIn", LocalDate.of(2025, 8, 30), LocalDate.of(2025, 12, 30), "San Diego", 8, "Co-Op", 5000, "https://linkedin.com", null, null); 
+		HttpEntity<JobEntry> request = new HttpEntity<>(jobEntryUpdate); 
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("miles1", "password123")
+				.exchange("/jobseeker/20", HttpMethod.PUT, request, Void.class);
+		
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);  
+		
+		ResponseEntity<String> getResponse = restTemplate.withBasicAuth("miles1","password123").getForEntity("/jobseeker/20", String.class); 
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody()); 
+		Number id = documentContext.read("$.jobID");
+		String jobName = documentContext.read("$.jobName"); 
+		String jobLocation = documentContext.read("$.jobLocation"); 
 
+		assertThat(id).isEqualTo(20); 
+		assertThat(jobLocation).isEqualTo("San Diego"); 
+		assertThat(jobName).isEqualTo("Machine Testing"); 
+	}
 
-	
+	/// Request Type : PUT 
+	/// Description : failing PUT request, unknown record should not replace (suddenly exist) 
+	/// Expect : "404 NOT_FOUND"
+	@Test
+	void putNonExistentJobEntry() {
+		JobEntry nonExistentEntry = new JobEntry("Machine Testing", "LinkedIn", LocalDate.of(2025, 8, 30), LocalDate.of(2025, 12, 30), "San Diego", 8, "Co-Op", 5000, "https://linkedin.com", null, null);
+		HttpEntity<JobEntry> request= new HttpEntity<>(nonExistentEntry); 
+		ResponseEntity<Void> response = restTemplate
+			.withBasicAuth("miles1", "password123")
+			.exchange("/jobseeker/99999999", HttpMethod.PUT, request, Void.class); 
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
+	}
+
+	/// Request Type : PUT 
+	/// Description : failing PUT request, unauthorized user should not be able to replace another user's job posting
+	/// Expect : "404 NOT_FOUND"
+	@Test
+	void putUnauthorized() {
+		JobEntry jobEntryUpdate = new JobEntry("Machine Testing", "LinkedIn", LocalDate.of(2025, 8, 30), LocalDate.of(2025, 12, 30), "San Diego", 8, "Co-Op", 5000, "https://linkedin.com", null, null); 
+		HttpEntity<JobEntry> request = new HttpEntity<>(jobEntryUpdate); 
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("job-searcher", "no-jobs-posted")
+				.exchange("/jobseeker/20", HttpMethod.PUT, request, Void.class);
+		
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);  
+	}
 
 
 }
