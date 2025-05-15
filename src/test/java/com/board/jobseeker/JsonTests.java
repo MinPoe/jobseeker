@@ -34,13 +34,13 @@ class JsonTests {
 
         jobs = Arrays.array(
             new JobEntry("Software Engineering", "LinkedIn",postDate_1 ,closeDate_1,
-                        "Seattle", 4, "Internship", 3000, "https://linkedin.com", 20L), 
+                        "Seattle", 4, "Internship", 3000, "https://linkedin.com", 20L, "miles1"), 
 
             new JobEntry("Firmware Testing", "Nvidia", postDate_2,closeDate_2,
-                        "Santa Clara", 3, "Internship", 4000, "https://nvidia.careers.com", 21L),
+                        "Santa Clara", 3, "Internship", 4000, "https://nvidia.careers.com", 21L, "liam"),
 
             new JobEntry("Hardware Testing", "Intel", postDate_3, closeDate_3,
-                        "Vancouver", 4, "Part-Time", 5000, "https://intel.careers.com", 22L) 
+                        "Vancouver", 4, "Part-Time", 5000, "https://intel.careers.com", 22L, "peter2") 
         );
     }
 
@@ -54,7 +54,7 @@ class JsonTests {
             LocalDate.of(2025,4,20),
             "Jakarta", 3,
             "Internship", 20,
-            "https://linkedin.com", 10L);
+            "https://linkedin.com", 10L, "james");
 
         // takes 'job' object and writes it in json format, asserting to expected perfect outcome
         // NOTE: checks every field 
@@ -70,7 +70,7 @@ class JsonTests {
             JobEntry.NO_CLOSE_DATE,
             "Jakarta", 3,
             "Internship", 20,
-            "https://linkedin.com", 10L);
+            "https://linkedin.com", 10L, "james");
 
         // check that closeDate fields is empty
         assertThat(jsonContainer.write(job)).extractingJsonPathStringValue("@.closeDate").isEqualTo(JobEntry.NO_CLOSE_DATE.toString()); 
@@ -85,7 +85,7 @@ class JsonTests {
             JobEntry.NO_CLOSE_DATE,
             "Canada", 3,
             "Internship", 20,
-            "https://linkedin.com", 10L);
+            "https://linkedin.com", 10L, "james");
 
         assertThat(jsonContainer.write(job)).extractingJsonPathStringValue("@.jobLocation").isNotEqualTo("Jakarta");
     }
@@ -104,7 +104,8 @@ class JsonTests {
                     "jobType": "Internship",
                     "jobPay": 24, 
                     "jobLink": "https://jj-cafe-jobs.com",
-                    "jobID": 11
+                    "jobID": 11, 
+                    "owner": "sarah"
                 }
                 """;
 
@@ -112,7 +113,7 @@ class JsonTests {
             .isEqualTo(new JobEntry("Marketing Intern", "Uno Cafe", 
                                     LocalDate.of(2025,4,20), LocalDate.of(2025,4,30), 
                                     "Burnaby", 4, "Internship",
-                                    24, "https://jj-cafe-jobs.com", 11L
+                                    24, "https://jj-cafe-jobs.com", 11L, "sarah"
                                     ));
     }
 
@@ -130,7 +131,8 @@ class JsonTests {
                     "jobType": "Internship",
                     "jobPay": 24, 
                     "jobLink": "https://jj-cafe-jobs.com",
-                    "jobID": 11
+                    "jobID": 11,
+                    "owner": "sarah"
                 }
                 """;
 
@@ -138,7 +140,7 @@ class JsonTests {
             .isNotEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
                                     LocalDate.of(2025,4,20), LocalDate.of(2025,4,30), 
                                     "Burnaby", 4, "Internship",
-                                    23, "https://jj-cafe-jobs.com", 11L
+                                    23, "https://jj-cafe-jobs.com", 11L, "sarah"
                                     ));
     }
 
@@ -166,7 +168,8 @@ class JsonTests {
                         "jobType": "Internship",
                         "jobPay": 3000,
                         "jobLink": "https://linkedin.com",
-                        "jobID": 20
+                        "jobID": 20, 
+                        "owner": "miles1"
                     },
 
                     {
@@ -179,7 +182,8 @@ class JsonTests {
                         "jobType": "Internship",
                         "jobPay": 4000,
                         "jobLink": "https://nvidia.careers.com",
-                        "jobID": 21
+                        "jobID": 21,
+                        "owner": "liam"
                     },
 
                     {
@@ -192,7 +196,8 @@ class JsonTests {
                         "jobType": "Part-Time",
                         "jobPay": 5000,
                         "jobLink": "https://intel.careers.com",
-                        "jobID": 22
+                        "jobID": 22,
+                        "owner": "peter2" 
                     }
                 ]
                 """;

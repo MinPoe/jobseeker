@@ -13,8 +13,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.Optional; 
 import java.net.URI;
+import java.security.Principal;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,13 +50,14 @@ public class JobEntryController {
     }
 
     /// Request Type : POST 
-    ///     handles POST requests mapped to /jobseeker
+    ///     handles POST requests mapped to /jobseeker, created job entry's ownership goes to user who posted it 
     /// returns: 
     ///     status - HTTP "201 CREATED"
     ///     response body - location header field of resource created 
     @PostMapping
-    private ResponseEntity<Void> createJobEntry(@RequestBody JobEntry createdEntry, UriComponentsBuilder ucb) { 
-        JobEntry postedEntry = jobEntryRepository.save(createdEntry); 
+    private ResponseEntity<Void> createJobEntry(@RequestBody JobEntry createdEntry, UriComponentsBuilder ucb, Principal principal) { 
+        JobEntry jobEntry_withOwner = new JobEntry(createdEntry.jobName(), createdEntry.companyName(), createdEntry.postDate(), createdEntry.closeDate(), createdEntry.jobLocation(), createdEntry.jobDuration(), createdEntry.jobType(), createdEntry.jobPay(), createdEntry.jobLink(), null, principal.getName()); 
+        JobEntry postedEntry = jobEntryRepository.save(jobEntry_withOwner); 
 
         URI postLocation = ucb
                 .path("jobseeker/{jobID}")

@@ -15,8 +15,9 @@ import org.springframework.data.annotation.Id;
 /// jobPay - compensation that the job provides per month (TENTATIVE)
 /// jobLink - link to job application
 /// jobID - unique numeric identifier for each job 
+/// owner - user account that posted the job, thereby having access to modifications
 public record JobEntry (String jobName, String companyName, LocalDate postDate, LocalDate closeDate, 
-                        String jobLocation, int jobDuration, String jobType, int jobPay, String jobLink, @Id Long jobID) {
+                        String jobLocation, int jobDuration, String jobType, int jobPay, String jobLink, @Id Long jobID, String owner) {
     
     // CONSTANT anomalous value for NO_CLOSE_DATE
     public static final LocalDate NO_CLOSE_DATE = LocalDate.of(9999, 12, 31); 

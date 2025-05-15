@@ -9,7 +9,8 @@
         "jobType": "Internship",
         "jobPay": 3000,
         "jobLink": "https://linkedin.com",
-        "jobID": 20
+        "jobID": 20,
+        "owner": "miles1"
     },
 
     {
@@ -22,7 +23,8 @@
         "jobType": "Internship",
         "jobPay": 4000,
         "jobLink": "https://nvidia.careers.com",
-        "jobID": 21
+        "jobID": 21,
+        "owner": "liam"
     },
 
     {
@@ -35,6 +37,7 @@
         "jobType": "Part-Time",
         "jobPay": 5000,
         "jobLink": "https://intel.careers.com",
-        "jobID": 22
+        "jobID": 22,
+        "owner": "peter2"
     }
 ]

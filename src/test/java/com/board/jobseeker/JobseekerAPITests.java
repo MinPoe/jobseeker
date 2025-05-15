@@ -4,7 +4,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
 
-import org.h2.jmx.DocumentedMBean;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +32,7 @@ class JobseekerAPITests {
 	/// Description : given an existing job entry, should be able to request 'get' the entry (PASSING test)
 	@Test
 	void getAvailableJobEntry() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/21", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker/21", String.class); 
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		
@@ -59,18 +58,31 @@ class JobseekerAPITests {
 	/// Description : when requested for an invalid job entry ID, should return HTTP status "404 NOT FOUND" (PASSING test)
 	@Test
 	void getUnknownJobEntry() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker/0", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker/0", String.class); 
 
 		// assert that the response is 404 and returns an empty body 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
 		assertThat(response.getBody()).isBlank(); 
 	}
 
+	/// Request Type : GET
+	/// Security : AUTHENTICATION 
+	/// Description : GET request with bad credentials, unauthenticated request should return HTTP "401 UNAUTHORIZED" (FAILING TEST)
+	@Test
+	void getBadCredentials() {
+		ResponseEntity<String> response = restTemplate.withBasicAuth("BAD_CRED", "password123").getForEntity("/jobseeker", String.class); 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED); 
+
+
+		response = restTemplate.withBasicAuth("miles1", "BAD_PASS").getForEntity("/jobseeker", String.class); 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED); 
+	}
+
 	/// Request Type : GET 
-	/// Description : when requested for list of job entry that exists, should return 
+	/// Description : when requested for list of job entry that exists, should return them 
 	@Test 
 	void getJobEntryList() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker", String.class); 
  
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
@@ -92,7 +104,7 @@ class JobseekerAPITests {
 	/// Description : when requested for page of existing job entries, return successfully 
 	@Test
 	void getPageOfJobEntries() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker?page=0&size=1", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker?page=0&size=1", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -104,7 +116,7 @@ class JobseekerAPITests {
 	/// Description : when requested for page of existing job entries with descending order, return successfully
 	@Test
 	void getSortedPageOfJobEntries() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker?page=0&size=1&sort=jobID,desc", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker?page=0&size=1&sort=jobID,desc", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -121,7 +133,7 @@ class JobseekerAPITests {
 	/// Expect : "200 OK", default sorting should be ascending order of jobID
 	@Test
 	void getDefaultPageOfJobEntries() {
-		ResponseEntity<String> response = restTemplate.getForEntity("/jobseeker", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -135,31 +147,33 @@ class JobseekerAPITests {
 
 	/// Request Type : POST 
 	/// Description : non-failing POST request to API, database should update 
-	/// Expect : "201 CREATED", GET request to new resource location to be "200 OK" 
+	/// Expect : "201 CREATED", GET request to new resource location to be "200 OK", with ownership belonging to poster 
 	/// NOTE : creates new job entry, needs @DirtiesContext
 	@DirtiesContext
 	@Test
 	void createNewJobEntry() { 
 		LocalDate postDateEntry = LocalDate.parse("2025-01-30");
 		LocalDate closeDateEntry = LocalDate.parse("2025-05-30");
-		JobEntry newEntry = new JobEntry("Marketing Intern", "Meta", postDateEntry, closeDateEntry, "Texas", 4, "Internship", 12000, "https://meta.com", null); 
+		JobEntry newEntry = new JobEntry("Marketing Intern", "Meta", postDateEntry, closeDateEntry, "Texas", 4, "Internship", 12000, "https://meta.com", null, "jacob"); 
 
-		ResponseEntity<Void> responsePOST = restTemplate.postForEntity("/jobseeker", newEntry, Void.class); 
+		ResponseEntity<Void> responsePOST = restTemplate.withBasicAuth("miles1", "password123").postForEntity("/jobseeker", newEntry, Void.class); 
 
 		assertThat(responsePOST.getStatusCode()).isEqualTo(HttpStatus.CREATED); 
 
 		// the response should contain a header with the location of resource created 
 		URI jobEntryLocation = responsePOST.getHeaders().getLocation();
-		ResponseEntity<String> getResponse = restTemplate.getForEntity(jobEntryLocation, String.class); 
+		ResponseEntity<String> getResponse = restTemplate.withBasicAuth("miles1", "password123").getForEntity(jobEntryLocation, String.class); 
 
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody()); 
 		Number id = documentContext.read("$.jobID"); 
 		Integer jobPay = documentContext.read("$.jobPay"); 
+		String owner = documentContext.read("$.owner"); 
 
 		assertThat(id).isNotNull(); 
 		assertThat(jobPay).isEqualTo(12000);
+		assertThat(owner).isEqualTo("miles1");
 
 	}
 
