@@ -93,26 +93,17 @@ public class JobEntryController {
     ///     response body - empty 
     @PutMapping("/{requestedID}")
     private ResponseEntity<Void> putJobEntry(@PathVariable Long requestedID, @RequestBody JobEntry update, Principal principal) {
-        // TODO: REPLACE if(owner.equals()) test with findByIdAndOwner() method to automatically check if id and owner match
-        Optional<JobEntry> jobEntry = jobEntryRepository.findById(requestedID); 
+        JobEntry jobEntry = jobEntryRepository.findByJobIDAndOwner(requestedID, principal.getName()); 
 
-        if (jobEntry.isPresent()) {
-            JobEntry jobEntryToUpdate = jobEntry.get(); 
-            
-            if (jobEntryToUpdate.owner().equals(principal.getName())) {
-                JobEntry updatedJobEntry = new JobEntry(update.jobName(), update.companyName(), update.postDate(), update.closeDate(), update.jobLocation(), update.jobDuration(), update.jobType(), update.jobPay(), update.jobLink(), jobEntryToUpdate.jobID(), principal.getName()); 
-                jobEntryRepository.save(updatedJobEntry); 
+        if (jobEntry != null) {
+            JobEntry updatedJobEntry = new JobEntry(update.jobName(), update.companyName(), update.postDate(), update.closeDate(), update.jobLocation(), update.jobDuration(), update.jobType(), update.jobPay(), update.jobLink(), jobEntry.jobID(), principal.getName()); 
+            jobEntryRepository.save(updatedJobEntry); 
 
-                return ResponseEntity.noContent().build();
-            }
-
-            else { 
-                // upon non-existent IDs or unauthorized PUT requests, return ambiguous "404 NOT FOUND" to conceal information 
-                return ResponseEntity.notFound().build(); 
-            }
+            return ResponseEntity.noContent().build();
         }
 
-        else {
+        else { 
+            // upon non-existent IDs or unauthorized PUT requests, return ambiguous "404 NOT FOUND" to conceal information 
             return ResponseEntity.notFound().build(); 
         }
     }

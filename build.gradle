@@ -42,6 +42,6 @@ test {
         showStackTraces true
 
         // verbose test output
-        showStandardStreams = true
+        showStandardStreams = false
     }
 }
