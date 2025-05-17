@@ -9,4 +9,6 @@ interface JobEntryRepository extends CrudRepository<JobEntry, Long>, PagingAndSo
     
     // returns a specific job entry given jobID and owner, used for requests that require authorization 
     JobEntry findByJobIDAndOwner(Long jobID, String owner); 
+
+    boolean existsByJobIDAndOwner(Long jobID, String owner); 
 }

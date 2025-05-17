@@ -19,8 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDate;
 import java.net.URI;
 
-import static org.springframework.test.annotation.DirtiesContext.*;
-
 @SpringBootTest(
 	// start Spring boot application to allow for testing 
 	webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
@@ -235,5 +233,51 @@ class JobseekerAPITests {
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);  
 	}
 
+	/// Request Type : DELETE 
+	/// Description : successful DELETE request, jobEntry with associated ID should be deleted when requested by respective owner 
+	/// Expect : "204 NO_CONTENT"
+	/// Note : needs DirtiesContext
+	@DirtiesContext
+	@Test
+	void deleteAuthorized() {
+		// .exchange() used instead of .delete(), .delete() does not return body thus no status code returned
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("miles1", "password123")
+				.exchange("/jobseeker/20", HttpMethod.DELETE, null, Void.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+
+		ResponseEntity<String> getResponse = restTemplate
+				.withBasicAuth("miles1", "password123")
+				.getForEntity("/jobseeker/20", String.class); 
+
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
+	}
+
+	/// Request Type : DELETE 
+	/// Description : failing DELETE request, DELETE request by non-owner of job entry 
+	/// Expect : "404 NOT_FOUND"	
+	@Test
+	void deleteUnauthorized() {
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("job-searcher", "no-jobs-posted")
+				.exchange("/jobseeker/20", HttpMethod.DELETE, null, Void.class); 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
+
+		ResponseEntity<String> getResponse = restTemplate
+				.withBasicAuth("miles1", "password123")
+				.getForEntity("/jobseeker/20",String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	/// Request Type : DELETE 
+	/// Description : failing DELETE request, DELETE non-existent job entry
+	/// Expect : "404 NOT_FOUND"
+	@Test 
+	void deleteNonExistentJobEntry() {
+		ResponseEntity<Void> response = restTemplate
+				.withBasicAuth("miles1", "password123")
+				.exchange("/jobseeker/99999", HttpMethod.DELETE, null, Void.class); 
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
+	}
 
 }

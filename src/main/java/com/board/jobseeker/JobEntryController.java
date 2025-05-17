@@ -1,6 +1,7 @@
 package com.board.jobseeker;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.net.URI;
 import java.security.Principal;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -108,4 +110,18 @@ public class JobEntryController {
         }
     }
 
+    /// Request Type : DELETE
+    ///     handles DELETE requests mapped to /jobseeker/{requestedID}
+    /// returns: 
+    ///     status - HTTP "204 NO_CONTENT"
+    ///     response body - empty 
+    @DeleteMapping("/{requestedID}") 
+    private ResponseEntity<Void> deleteJobEntry(@PathVariable Long requestedID, Principal principal) {
+        if (jobEntryRepository.existsByJobIDAndOwner(requestedID, principal.getName())) {
+            jobEntryRepository.deleteById(requestedID);
+            return ResponseEntity.noContent().build(); 
+        }
+
+        return ResponseEntity.notFound().build(); 
+    }
 }
