@@ -127,7 +127,7 @@ public class JobEntryController {
         }
     }
 
-    /// Request Type : PATCH 
+    /// Request Type : PATCH with JSON-Patch format 
     ///     handles PATCH requests mapped to /jobseeker/{requestedID}
     /// returns: 
     ///     status - HTTP "204 NO_CONTENT"
@@ -140,7 +140,7 @@ public class JobEntryController {
             jobEntryRepository.save(jobPatched); 
             return ResponseEntity.noContent().build(); 
         } catch (JsonPatchException | JsonProcessingException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // TODO: maybe change to different error code for ambiguity? 
         } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -149,12 +149,18 @@ public class JobEntryController {
     /// Helper Method
     ///     applies PATCHES to job entries 
     public JobEntry applyPatchToJob(JsonPatch patch, JobEntry job) throws JsonPatchException, JsonProcessingException {
+        // allow conversion of object to JSON 
         ObjectMapper objectMapper = new ObjectMapper();
+        // proper handling of LocalDate fields 
         objectMapper.registerModule(new JavaTimeModule());
+        // keep dates in same format, instead of timestamps 
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+        // convert JobEntry job object to JSON
         JsonNode originalNode = objectMapper.convertValue(job, JsonNode.class);
+        // traverse originalNode tree using patch path and apply operations 
         JsonNode patchedNode = patch.apply(originalNode);
+        // convert JSON back to JobEntry type 
         JobEntry result = objectMapper.treeToValue(patchedNode, JobEntry.class);
 
         return result;

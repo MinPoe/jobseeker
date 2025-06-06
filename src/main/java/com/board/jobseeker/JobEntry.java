@@ -21,17 +21,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /// owner - user account that posted the job, thereby having access to modifications
 
 public record JobEntry (
-    @JsonProperty("jobName") String jobName, 
-    @JsonProperty("companyName") String companyName, 
-    @JsonProperty("postDate") LocalDate postDate, 
-    @JsonProperty("closeDate") LocalDate closeDate,
-    @JsonProperty("jobLocation") String jobLocation, 
-    @JsonProperty("jobDuration") int jobDuration, 
-    @JsonProperty("jobType") String jobType, 
-    @JsonProperty("jobPay") int jobPay, 
-    @JsonProperty("jobLink") String jobLink, 
-    @JsonProperty("jobID") @Id Long jobID, 
-    @JsonProperty("owner") String owner) {
+    String jobName, 
+    String companyName, 
+    LocalDate postDate, 
+    LocalDate closeDate,
+    String jobLocation, 
+    int jobDuration, 
+    String jobType, 
+    int jobPay, 
+    String jobLink, 
+    @Id Long jobID, 
+    String owner) {
     
     // CONSTANT anomalous value for NO_CLOSE_DATE
     public static final LocalDate NO_CLOSE_DATE = LocalDate.of(9999, 12, 31); 
