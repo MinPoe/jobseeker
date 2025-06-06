@@ -5,8 +5,6 @@ import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /// The JobEntry data type will store:
 /// jobName - the name of the job position
 /// companyName - the name of the company posting the job

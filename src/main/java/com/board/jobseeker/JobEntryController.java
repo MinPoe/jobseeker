@@ -2,7 +2,6 @@ package com.board.jobseeker;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +9,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +19,6 @@ import java.util.Optional;
 import java.net.URI;
 import java.security.Principal;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -151,7 +147,7 @@ public class JobEntryController {
     public JobEntry applyPatchToJob(JsonPatch patch, JobEntry job) throws JsonPatchException, JsonProcessingException {
         // allow conversion of object to JSON 
         ObjectMapper objectMapper = new ObjectMapper();
-        // proper handling of LocalDate fields 
+        // register module for proper handling of LocalDate fields 
         objectMapper.registerModule(new JavaTimeModule());
         // keep dates in same format, instead of timestamps 
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

@@ -4,9 +4,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.fge.jsonpatch.JsonPatch; 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -269,6 +266,7 @@ class JobseekerAPITests {
 			.withBasicAuth("miles1", "password123")
 			.exchange("/jobseeker/20", HttpMethod.PATCH, requestEntity, Void.class);
 		
+		assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT); 
 		// Verify the change persisted by getting the job entry
 		ResponseEntity<JobEntry> getResponse = restTemplate
 				.withBasicAuth("miles1", "password123")
