@@ -1,11 +1,16 @@
 package com.board.jobseeker;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,6 +27,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+// JSON imports
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+
+// LocalDate handling 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 
 @RestController  // allow for HTTP request handling 
 @RequestMapping("/jobseeker") // HTTP requests mapped to this are directed to this controller  
@@ -110,11 +127,46 @@ public class JobEntryController {
         }
     }
 
-    /// Request Type : DELETE
-    ///     handles DELETE requests mapped to /jobseeker/{requestedID}
+    /// Request Type : PATCH 
+    ///     handles PATCH requests mapped to /jobseeker/{requestedID}
     /// returns: 
     ///     status - HTTP "204 NO_CONTENT"
     ///     response body - empty 
+    @PatchMapping(path = "/{requestedID}", consumes ="application/json-patch+json")
+    private ResponseEntity<Void> patchJobEntry(@PathVariable Long requestedID, @RequestBody JsonPatch patch, Principal principal) {
+        try {
+            JobEntry jobEntry = jobEntryRepository.findByJobIDAndOwner(requestedID, principal.getName()); 
+            JobEntry jobPatched = applyPatchToJob(patch, jobEntry);
+            jobEntryRepository.save(jobPatched); 
+            return ResponseEntity.noContent().build(); 
+        } catch (JsonPatchException | JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    /// Helper Method
+    ///     applies PATCHES to job entries 
+    public JobEntry applyPatchToJob(JsonPatch patch, JobEntry job) throws JsonPatchException, JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        JsonNode originalNode = objectMapper.convertValue(job, JsonNode.class);
+        JsonNode patchedNode = patch.apply(originalNode);
+        JobEntry result = objectMapper.treeToValue(patchedNode, JobEntry.class);
+
+        return result;
+    }
+
+    /// Request Type : DELETE
+    ///     handles HARD DELETE requests mapped to /jobseeker/{requestedID}, permanently deleting job entries
+    /// returns: 
+    ///     status - HTTP "204 NO_CONTENT"
+    ///     response body - empty 
+    /// NOTE: 
+    ///     quirk - if non-registered user (random username and password) requests unauthorized DELETE, it shows "UNAUTHORIZED" instead of "NOT FOUND"
     @DeleteMapping("/{requestedID}") 
     private ResponseEntity<Void> deleteJobEntry(@PathVariable Long requestedID, Principal principal) {
         if (jobEntryRepository.existsByJobIDAndOwner(requestedID, principal.getName())) {
@@ -124,4 +176,6 @@ public class JobEntryController {
 
         return ResponseEntity.notFound().build(); 
     }
+
+
 }

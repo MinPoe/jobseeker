@@ -18,13 +18,22 @@ repositories {
 }
 
 dependencies {
+	implementation 'com.github.java-json-tools:json-patch:1.13'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// needed for tests to support HTTP PATCH method 
+	testImplementation 'org.apache.httpcomponents.client5:httpclient5'
 	
 	implementation 'org.springframework.data:spring-data-jdbc'
     implementation 'com.h2database:h2'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// handle LocalDate type
+	implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 }
 
 tasks.named('test') {
@@ -42,6 +51,6 @@ test {
         showStackTraces true
 
         // verbose test output
-        showStandardStreams = false
+        showStandardStreams = true
     }
 }

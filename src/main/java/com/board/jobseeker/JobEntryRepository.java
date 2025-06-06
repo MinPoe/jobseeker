@@ -11,4 +11,5 @@ interface JobEntryRepository extends CrudRepository<JobEntry, Long>, PagingAndSo
     JobEntry findByJobIDAndOwner(Long jobID, String owner); 
 
     boolean existsByJobIDAndOwner(Long jobID, String owner); 
+
 }

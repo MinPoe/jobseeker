@@ -4,15 +4,24 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch; 
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;	
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.http.HttpEntity; 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +35,14 @@ import java.net.URI;
 class JobseekerAPITests {
 	// dependency injection (autowired) for test helper to aid in HTTP request creation 
 	@Autowired 
-	TestRestTemplate restTemplate; 
+	private TestRestTemplate restTemplate; 
+
+	@BeforeEach
+    void setUp() {
+        restTemplate.getRestTemplate().setRequestFactory(
+            new HttpComponentsClientHttpRequestFactory()
+        );
+    }
 
 	/// Request Type : GET 
 	/// Description : given an existing job entry, should be able to request 'get' the entry (PASSING test)
@@ -231,6 +247,36 @@ class JobseekerAPITests {
 				.exchange("/jobseeker/20", HttpMethod.PUT, request, Void.class);
 		
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);  
+	}
+
+	/// Request Type : PATCH 
+	/// Description : non-failing PATCH request, record should update with new patch
+	/// Expect : "204 NO_CONTENT", GET request comparison should contain new value
+	/// Note : needs DirtiesContext
+	@DirtiesContext
+	@Test
+	void patchAuthorized() {
+		// Create JSON Patch request body
+		String patchBody = "[{\"op\": \"replace\", \"path\": \"/jobName\", \"value\": \"Updated Job Name\"}]";
+		
+		// Set up headers for JSON Patch
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.valueOf("application/json-patch+json"));
+		HttpEntity<String> requestEntity = new HttpEntity<>(patchBody, headers);
+    
+		// Execute PATCH request using patchForObject
+		ResponseEntity<Void> patchResponse = restTemplate
+			.withBasicAuth("miles1", "password123")
+			.exchange("/jobseeker/20", HttpMethod.PATCH, requestEntity, Void.class);
+		
+		// Verify the change persisted by getting the job entry
+		ResponseEntity<JobEntry> getResponse = restTemplate
+				.withBasicAuth("miles1", "password123")
+				.getForEntity("/jobseeker/20", JobEntry.class);
+		
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+		assertThat(getResponse.getBody().jobName()).isEqualTo("Updated Job Name"); 
 	}
 
 	/// Request Type : DELETE 
