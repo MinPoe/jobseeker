@@ -1,0 +1,272 @@
+
+/* pre-defined templates */
+ul, ol, p {
+    margin: 0px; 
+    padding: 0px;
+}
+
+.inter-font {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.montserrat-font {
+    font-family:'Montserrat', Arial, sans-serif;
+}
+/* main css */
+body {
+    margin: 0px;
+    font-family:Verdana, Geneva, Tahoma, sans-serif; 
+}
+
+.webpage-container {
+    display:flex; 
+    flex-direction:column; 
+    width:100%;
+    height:100%;
+}
+
+.landing {
+    justify-content: space-between;
+}
+
+.results {
+    justify-content: flex-start; 
+}
+
+.webpage-header {
+    display:flex; 
+    justify-content:space-between; 
+    height:70px;
+    background-color:#2C3930;
+}
+
+.company-logo {
+    display:flex; 
+    align-items:center;
+    gap:10px;
+    padding:17px;
+}
+
+.company-name-text {
+    color: white; 
+    font-weight:800;
+}
+
+#logo {
+    width:40px; 
+    height:40px;
+}
+
+.account-operations {
+    padding:17px;
+    display:flex; 
+    align-items:center;
+}
+
+.nav-links {
+    list-style-type:none;
+    display:flex; 
+    justify-content:space-between;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration:none;
+    color:white;
+    font-family:'Montserrat', Arial, sans-serif; 
+    font-weight:800;
+}
+
+.nav-button {
+    height:27px;
+    width:auto;
+    padding: 4px 12px;
+    display:flex; 
+    align-items:center;
+    background-color:black;
+    border-radius:10px;
+}
+
+.webpage-body {
+    display:flex; 
+    flex-direction:column;
+    align-items:center;
+}
+
+.search-brand {
+    font-weight:800; 
+    font-size:80px;
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.search-container {
+    position:relative;
+    margin: 0 auto;
+}
+
+.landing-search {
+    max-width: 600px;
+}
+
+.results-search {
+    margin-top:10px;
+    max-width: 800px;
+}
+
+.search-input {
+    width: 100%;
+    top: 50%;
+    height:100%;
+    border-radius: 12px;
+    padding: 12px 50px 12px 16px;
+    border: 2px solid #D1D5DB; 
+    background-color:#f9fafb;
+    outline:none;
+    transition: all 0.5s ease;
+}
+
+.search-input:focus {
+    border-color: #3b82f6;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(60, 133, 252, 0.1);
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+    font-family:inherit;
+    font-size:16px;
+}
+
+.search-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px; 
+    height: 32px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.5s ease;
+}
+
+.search-icon:hover {
+    color: #374151;
+}
+
+#items-container {
+    display:flex; 
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:10px;
+
+    width:80%;
+}
+
+.job-card-container {
+    border:2px solid rgba(0,0,0,0.40);
+    border-radius:10px;
+    max-width:400px;
+    max-height:400px;
+    padding:24px;
+
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+}
+
+.job-card-container:hover {
+    border:2px solid rgba(0,0,0,0.40);
+    box-shadow: 1px 4px 4px 0 rgba(0, 0, 0, 0.30);
+}
+
+.job-card-container:focus {
+    border:2px solid rgba(0,0,0,0.80);
+    box-shadow: 1px 4px 4px 0 rgba(0, 0, 0, 0.30);
+}
+
+.job-header {
+    display:flex; 
+    flex-direction:column;
+    gap:4px;
+    margin-bottom:15px;
+}
+
+.job-title {
+    font-size:20px;
+    font-weight:bold;
+}
+
+.company-name {
+    font-size:14px;
+    color:rgba(0,0,0,0.62);
+    font-weight:550;
+}
+
+.job-location {
+    font-size:10px;
+    color:rgba(0,0,0,0.62);
+    font-weight:550;
+}
+
+.job-type {
+    font-size:14px;
+    color:rgba(0,0,0,0.62);
+
+    font-weight:700;
+}
+
+.job-description {
+    font-size:18px;
+    font-weight:350;
+    margin-bottom:20px;
+    max-height:none; 
+    height:auto;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 4;           
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.job-pay, .job-duration{
+    font-size:13px;
+    font-weight:400;
+    color:rgba(0,0,0,0.60);
+}
+
+.job-pay {
+    margin-bottom:7px;
+}
+
+.job-footer {
+    display:flex; 
+    flex-direction:row; 
+    align-items:center;
+    gap:5px;
+
+    margin-top:40px;
+}
+
+.calendar-icon {
+    width:30px;
+    height:30px;
+}
+
+.job-post-time {
+    font-size:12px;
+    color:rgba(0,0,0,0.80);
+}
+
+.job-company-logo {
+    width:30px;
+    height:30px;
+}
+
+
+
+

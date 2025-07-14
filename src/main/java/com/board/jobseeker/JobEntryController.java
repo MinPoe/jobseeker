@@ -35,9 +35,10 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+// TODO: maybe separate API controller file into 2: user-permission (job-seeker) and company-permission (job-poster)
 
 @RestController  // allow for HTTP request handling 
-@RequestMapping("/jobseeker") // HTTP requests mapped to this are directed to this controller  
+@RequestMapping("/api") // HTTP requests mapped to this are directed to this controller  
 public class JobEntryController {
 
     // inject repository to manage JobEntry data 
@@ -49,7 +50,7 @@ public class JobEntryController {
     }
 
     /// Request Type : GET 
-    ///     handles GET requests mapped to /jobseeker, with default sort of jobID in ascending order
+    ///     handles GET requests mapped to /api, with default sort of jobID in ascending order
     /// returns: 
     ///     status - HTTP "200 OK"
     ///     response body - list of job entry data with pagination 
@@ -66,7 +67,7 @@ public class JobEntryController {
     }
 
     /// Request Type : POST 
-    ///     handles POST requests mapped to /jobseeker, created job entry's ownership goes to user who posted it 
+    ///     handles POST requests mapped to /api, created job entry's ownership goes to user who posted it 
     /// returns: 
     ///     status - HTTP "201 CREATED"
     ///     response body - location header field of resource created 
@@ -76,7 +77,7 @@ public class JobEntryController {
         JobEntry postedEntry = jobEntryRepository.save(jobEntry_withOwner); 
 
         URI postLocation = ucb
-                .path("jobseeker/{jobID}")
+                .path("api/{jobID}")
                 .buildAndExpand(postedEntry.jobID())
                 .toUri();
         return ResponseEntity.created(postLocation).build();
@@ -84,7 +85,7 @@ public class JobEntryController {
     
     
     /// Request Type : GET 
-    ///     handles GET requests mapped to /jobseeker/{requestedID} 
+    ///     handles GET requests mapped to /api/{requestedID} 
     /// returns: 
     ///     status - HTTP "200 OK"
     ///     response body - job entry data 
@@ -102,7 +103,7 @@ public class JobEntryController {
     }   
 
     /// Request Type : PUT 
-    ///     handles PUT requests mapped to /jobseeker/{requestedID}
+    ///     handles PUT requests mapped to /api/{requestedID}
     /// returns: 
     ///     status - HTTP "204 NO_CONTENT"
     ///     response body - empty 
@@ -124,7 +125,7 @@ public class JobEntryController {
     }
 
     /// Request Type : PATCH with JSON-Patch format 
-    ///     handles PATCH requests mapped to /jobseeker/{requestedID}
+    ///     handles PATCH requests mapped to /api/{requestedID}
     /// returns: 
     ///     status - HTTP "204 NO_CONTENT"
     ///     response body - empty 
@@ -147,7 +148,7 @@ public class JobEntryController {
     public JobEntry applyPatchToJob(JsonPatch patch, JobEntry job) throws JsonPatchException, JsonProcessingException {
         // allow conversion of object to JSON 
         ObjectMapper objectMapper = new ObjectMapper();
-        // register module for proper handling of LocalDate fields 
+        // register module for proper handling of LocalDate fields that Jackson doesn't serialize/deserialize
         objectMapper.registerModule(new JavaTimeModule());
         // keep dates in same format, instead of timestamps 
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -163,7 +164,7 @@ public class JobEntryController {
     }
 
     /// Request Type : DELETE
-    ///     handles HARD DELETE requests mapped to /jobseeker/{requestedID}, permanently deleting job entries
+    ///     handles HARD DELETE requests mapped to /api/{requestedID}, permanently deleting job entries
     /// returns: 
     ///     status - HTTP "204 NO_CONTENT"
     ///     response body - empty 

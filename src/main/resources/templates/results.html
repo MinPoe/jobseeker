@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/webpage.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>jobseeker</title>
+    <script src="js/job-cards.js" defer></script>
+</head>
+<body>
+    <div class="webpage-container results">
+        <div class="webpage-header">
+            <div class="company-logo">
+                <img src="images/char-pikachu.png" id="logo">
+                <p class="company-name-text montserrat-font">jobseeker</p>
+            </div>
+            <div class="account-operations">
+                <nav>
+                    <ul class="nav-links">
+                        <div class="nav-button"><li><a href="login">Login</a></li></div>
+                        
+                        <div class="nav-button"><li><a href="register">Register</a></li></div>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+
+        <div class="webpage-body">
+            <div class="search-container results-search">
+                <form action="results.html" method="GET">
+                    <input type="text" class="search-input inter-font" placeholder="Cari lowongan kerja...">
+                </form>
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="32" height ="32" class="search-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                </svg>
+            </div>
+
+            <button id="spawn-jobs">Spawn</button>
+
+            <div id="items-container"></div>
+        </div>
+
+        <div class="footer">
+            
+        </div>
+    </div>
+
+    <template id="job-card-template"> 
+        <div class="job-card-container inter-font">
+            <div class="left-container">
+                <div class="job-header">
+                    <p class="job-title">Software Engineering Intern</p>
+                    <p class="company-name">Alphabet Inc.</p>
+                    <p class="job-location">Jakarta, ID</p>
+                    <div class="job-type-tags">
+                        <p class="job-type">Internship</p>
+                        <div class="job-tags"></div>
+                    </div>
+                </div>
+
+                <div class="job-body">
+                    <div class="job-description">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Porro, assumenda iste. Ab, ipsum iste quae totam ex quibusdam! Sequi, voluptatibus hic. Ut reprehenderit sint doloribus dolorum laudantium corporis sed nisi.</div>
+                    <div class="job-pay-duration">
+                        <p class="job-pay">Job Pay: Rp.5,000,000 per month</p>
+                        <p class="job-duration">Duration: 4 months</p>
+                    </div>
+                </div>
+
+                <div class="job-footer">
+                    <div class="calendar-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                        </svg>
+                    </div>
+                    <div class="job-post-time">
+                        <p>Posted: 7 July</p>
+                    </div>
+                </div>
+            </div>
+            <div class="right-container">
+                <img src="images/google.png" class="job-company-logo">
+            </div>
+        </div>
+    </template>
+</body>
+</html>

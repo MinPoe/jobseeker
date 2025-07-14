@@ -45,7 +45,7 @@ class JobseekerAPITests {
 	/// Description : given an existing job entry, should be able to request 'get' the entry (PASSING test)
 	@Test
 	void getAvailableJobEntry() {
-		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker/21", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/api/21", String.class); 
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		
@@ -71,7 +71,7 @@ class JobseekerAPITests {
 	/// Description : when requested for an invalid job entry ID, should return HTTP status "404 NOT FOUND" (PASSING test)
 	@Test
 	void getUnknownJobEntry() {
-		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker/0", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/api/0", String.class); 
 
 		// assert that the response is 404 and returns an empty body 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
@@ -83,11 +83,11 @@ class JobseekerAPITests {
 	/// Description : GET request with bad credentials, unauthenticated request should return HTTP "401 UNAUTHORIZED" (FAILING TEST)
 	@Test
 	void getBadCredentials() {
-		ResponseEntity<String> response = restTemplate.withBasicAuth("BAD_CRED", "password123").getForEntity("/jobseeker", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("BAD_CRED", "password123").getForEntity("/api", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED); 
 
 
-		response = restTemplate.withBasicAuth("miles1", "BAD_PASS").getForEntity("/jobseeker", String.class); 
+		response = restTemplate.withBasicAuth("miles1", "BAD_PASS").getForEntity("/api", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED); 
 	}
 
@@ -95,7 +95,7 @@ class JobseekerAPITests {
 	/// Description : when requested for list of job entry that exists, should return them 
 	@Test 
 	void getJobEntryList() {
-		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/api", String.class); 
  
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
@@ -117,7 +117,7 @@ class JobseekerAPITests {
 	/// Description : when requested for page of existing job entries, return successfully 
 	@Test
 	void getPageOfJobEntries() {
-		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker?page=0&size=1", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/api?page=0&size=1", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -129,7 +129,7 @@ class JobseekerAPITests {
 	/// Description : when requested for page of existing job entries with descending order, return successfully
 	@Test
 	void getSortedPageOfJobEntries() {
-		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker?page=0&size=1&sort=jobID,desc", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/api?page=0&size=1&sort=jobID,desc", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -146,7 +146,7 @@ class JobseekerAPITests {
 	/// Expect : "200 OK", default sorting should be ascending order of jobID
 	@Test
 	void getDefaultPageOfJobEntries() {
-		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/jobseeker", String.class); 
+		ResponseEntity<String> response = restTemplate.withBasicAuth("miles1", "password123").getForEntity("/api", String.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(response.getBody());
@@ -169,7 +169,7 @@ class JobseekerAPITests {
 		LocalDate closeDateEntry = LocalDate.parse("2025-05-30");
 		JobEntry newEntry = new JobEntry("Marketing Intern", "Meta", postDateEntry, closeDateEntry, "Texas", 4, "Internship", 12000, "https://meta.com", null, "jacob"); 
 
-		ResponseEntity<Void> responsePOST = restTemplate.withBasicAuth("miles1", "password123").postForEntity("/jobseeker", newEntry, Void.class); 
+		ResponseEntity<Void> responsePOST = restTemplate.withBasicAuth("miles1", "password123").postForEntity("/api", newEntry, Void.class); 
 
 		assertThat(responsePOST.getStatusCode()).isEqualTo(HttpStatus.CREATED); 
 
@@ -201,11 +201,11 @@ class JobseekerAPITests {
 		HttpEntity<JobEntry> request = new HttpEntity<>(jobEntryUpdate); 
 		ResponseEntity<Void> response = restTemplate
 				.withBasicAuth("miles1", "password123")
-				.exchange("/jobseeker/20", HttpMethod.PUT, request, Void.class);
+				.exchange("/api/20", HttpMethod.PUT, request, Void.class);
 		
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);  
 		
-		ResponseEntity<String> getResponse = restTemplate.withBasicAuth("miles1","password123").getForEntity("/jobseeker/20", String.class); 
+		ResponseEntity<String> getResponse = restTemplate.withBasicAuth("miles1","password123").getForEntity("/api/20", String.class); 
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK); 
 
 		DocumentContext documentContext = JsonPath.parse(getResponse.getBody()); 
@@ -227,7 +227,7 @@ class JobseekerAPITests {
 		HttpEntity<JobEntry> request= new HttpEntity<>(nonExistentEntry); 
 		ResponseEntity<Void> response = restTemplate
 			.withBasicAuth("miles1", "password123")
-			.exchange("/jobseeker/99999999", HttpMethod.PUT, request, Void.class); 
+			.exchange("/api/99999999", HttpMethod.PUT, request, Void.class); 
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
 	}
@@ -241,7 +241,7 @@ class JobseekerAPITests {
 		HttpEntity<JobEntry> request = new HttpEntity<>(jobEntryUpdate); 
 		ResponseEntity<Void> response = restTemplate
 				.withBasicAuth("job-searcher", "no-jobs-posted")
-				.exchange("/jobseeker/20", HttpMethod.PUT, request, Void.class);
+				.exchange("/api/20", HttpMethod.PUT, request, Void.class);
 		
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);  
 	}
@@ -264,13 +264,13 @@ class JobseekerAPITests {
 		// Execute PATCH request using patchForObject
 		ResponseEntity<Void> patchResponse = restTemplate
 			.withBasicAuth("miles1", "password123")
-			.exchange("/jobseeker/20", HttpMethod.PATCH, requestEntity, Void.class);
+			.exchange("/api/20", HttpMethod.PATCH, requestEntity, Void.class);
 		
 		assertThat(patchResponse.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT); 
 		// Verify the change persisted by getting the job entry
 		ResponseEntity<JobEntry> getResponse = restTemplate
 				.withBasicAuth("miles1", "password123")
-				.getForEntity("/jobseeker/20", JobEntry.class);
+				.getForEntity("/api/20", JobEntry.class);
 		
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -287,12 +287,12 @@ class JobseekerAPITests {
 		// .exchange() used instead of .delete(), .delete() does not return body thus no status code returned
 		ResponseEntity<Void> response = restTemplate
 				.withBasicAuth("miles1", "password123")
-				.exchange("/jobseeker/20", HttpMethod.DELETE, null, Void.class);
+				.exchange("/api/20", HttpMethod.DELETE, null, Void.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
 		ResponseEntity<String> getResponse = restTemplate
 				.withBasicAuth("miles1", "password123")
-				.getForEntity("/jobseeker/20", String.class); 
+				.getForEntity("/api/20", String.class); 
 
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
 	}
@@ -304,12 +304,12 @@ class JobseekerAPITests {
 	void deleteUnauthorized() {
 		ResponseEntity<Void> response = restTemplate
 				.withBasicAuth("job-searcher", "no-jobs-posted")
-				.exchange("/jobseeker/20", HttpMethod.DELETE, null, Void.class); 
+				.exchange("/api/20", HttpMethod.DELETE, null, Void.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
 
 		ResponseEntity<String> getResponse = restTemplate
 				.withBasicAuth("miles1", "password123")
-				.getForEntity("/jobseeker/20",String.class);
+				.getForEntity("/api/20",String.class);
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
@@ -320,7 +320,7 @@ class JobseekerAPITests {
 	void deleteNonExistentJobEntry() {
 		ResponseEntity<Void> response = restTemplate
 				.withBasicAuth("miles1", "password123")
-				.exchange("/jobseeker/99999", HttpMethod.DELETE, null, Void.class); 
+				.exchange("/api/99999", HttpMethod.DELETE, null, Void.class); 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND); 
 	}
 

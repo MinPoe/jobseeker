@@ -22,8 +22,10 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
        http
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/jobseeker/**")
-                        .authenticated())
+                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/", "/results.html").permitAll()
+                        .anyRequest().authenticated()
+                        )
                 .httpBasic(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable());
         return http.build();

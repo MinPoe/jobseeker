@@ -34,6 +34,9 @@ dependencies {
 
 	// handle LocalDate type
 	implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+
+	// template engine for visual testing 
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 }
 
 tasks.named('test') {
