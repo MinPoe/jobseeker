@@ -1,2 +1,0 @@
-# jobseeker
-Side Project
