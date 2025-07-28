@@ -1,4 +1,4 @@
-package com.board.jobseeker;
+package com.board.jobseeker.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

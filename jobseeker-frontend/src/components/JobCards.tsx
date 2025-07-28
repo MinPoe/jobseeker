@@ -3,11 +3,12 @@ import { mockJobs } from "@/lib/jobs";
 
 interface JobCardsProps {
     filters: SearchFilters; 
+    jobs: JobEntry[]; 
 }
 
-export default function JobCards({filters}: JobCardsProps) {
+export default function JobCards({filters, jobs}: JobCardsProps) {
 
-    const jobList = mockJobs.filter((job) => job.jobName.toLowerCase().includes(filters.keyword.toLowerCase()) 
+    const jobList = jobs.filter((job) => job.jobName.toLowerCase().includes(filters.keyword.toLowerCase()) 
                                         && job.jobLocation.toLowerCase().includes(filters.location.toLowerCase())
                                         && job.jobType.toLowerCase().includes(filters.jobType.toLowerCase()));
 

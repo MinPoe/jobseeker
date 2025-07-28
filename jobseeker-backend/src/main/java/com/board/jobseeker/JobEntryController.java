@@ -2,7 +2,7 @@ package com.board.jobseeker;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 // TODO: maybe separate API controller file into 2: user-permission (job-seeker) and company-permission (job-poster)
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController  // allow for HTTP request handling 
 @RequestMapping("/api") // HTTP requests mapped to this are directed to this controller  
 public class JobEntryController {
