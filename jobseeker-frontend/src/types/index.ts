@@ -17,3 +17,8 @@ export interface SearchFilters {
     location: string; 
     jobType: string; 
 }
+
+export interface LoginCredentials {
+    username: string; 
+    password: string; 
+}
