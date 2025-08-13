@@ -1,7 +1,9 @@
 package com.board.jobseeker.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -16,8 +18,20 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    // Inject test user credentials from environment variables
+    @Value("${test.user.poster.username}")
+    private String jobPosterUsername;
+    
+    @Value("${test.user.poster.password}")
+    private String jobPosterPassword;
+    
+    @Value("${test.user.seeker.username}")
+    private String jobSeekerUsername;
+    
+    @Value("${test.user.seeker.password}")
+    private String jobSeekerPassword;
+
     // @Bean - expect a bean to config filter chain
-    // TODO: enable CSRF when building web page 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
        http
@@ -38,21 +52,22 @@ public class SecurityConfig {
 
    // all API tests that make a HTTP request will use this example user to authenticate 
    @Bean 
+   @Profile({"dev", "docker", "test"})
    UserDetailsService testOnlyUsers(PasswordEncoder passwordEncoder) {
     User.UserBuilder users = User.builder(); 
-    // miles1 is a company job poster 
-    UserDetails miles = users
-        .username("miles1")
-        .password(passwordEncoder.encode("password123"))
+    // jobPoster is a company job poster 
+    UserDetails jobPoster = users
+        .username(jobPosterUsername)
+        .password(passwordEncoder.encode(jobPosterPassword))
         .roles("POST-OWNER")
         .build();
 
-    // nonJobPoster is a job seeker, therefore never having posted any job entries 
-    UserDetails nonJobPoster = users
-        .username("job-searcher")
-        .password(passwordEncoder.encode("no-jobs-posted"))
+    // jobSeeker is a job seeker, therefore never having posted any job entries nor having the privilege to 
+    UserDetails jobSeeker = users
+        .username(jobSeekerUsername)
+        .password(passwordEncoder.encode(jobSeekerPassword))
         .roles("JOB-SEEKER")
         .build(); 
-    return new InMemoryUserDetailsManager(miles, nonJobPoster); 
+    return new InMemoryUserDetailsManager(jobPoster, jobSeeker); 
    }
 }

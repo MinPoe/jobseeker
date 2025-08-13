@@ -6,12 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.time.LocalDate;
 
 @JsonTest
+@ActiveProfiles("test")
 class JsonTests {
     @Autowired
     private JacksonTester<JobEntry> jsonContainer;
@@ -110,7 +112,7 @@ class JsonTests {
                 """;
 
         assertThat(jsonContainer.parse(expectedFields))
-            .isEqualTo(new JobEntry("Marketing Intern", "Uno Cafe", 
+            .usingRecursiveComparison().isEqualTo(new JobEntry("Marketing Intern", "Uno Cafe", 
                                     LocalDate.of(2025,4,20), LocalDate.of(2025,4,30), 
                                     "Burnaby", 4, "Internship",
                                     24, "https://jj-cafe-jobs.com", 11L, "sarah"
@@ -137,7 +139,7 @@ class JsonTests {
                 """;
 
         assertThat(jsonContainer.parse(expectedFields))
-            .isNotEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
+            .usingRecursiveComparison().isNotEqualTo(new JobEntry("Marketing Intern", "JJ Cafe", 
                                     LocalDate.of(2025,4,20), LocalDate.of(2025,4,30), 
                                     "Burnaby", 4, "Internship",
                                     23, "https://jj-cafe-jobs.com", 11L, "sarah"
@@ -202,6 +204,6 @@ class JsonTests {
                 ]
                 """;
 
-                assertThat(jsonList.parse(expectedList)).isEqualTo(jobs); 
+                assertThat(jsonList.parse(expectedList)).usingRecursiveComparison().isEqualTo(jobs); 
     }
 }

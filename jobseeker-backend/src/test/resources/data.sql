@@ -1,6 +1,6 @@
-INSERT INTO JOB_ENTRY 
-    (JOB_ID, JOB_NAME, COMPANY_NAME, POST_DATE, CLOSE_DATE, 
-    JOB_LOCATION, JOB_DURATION, JOB_TYPE, JOB_PAY, JOB_LINK, OWNER) 
+INSERT INTO job_entry 
+    (job_id, job_name, company_name, post_date, close_date, 
+    job_location, job_duration, job_type, job_pay, job_link, owner)
 VALUES 
     (20, 'Software Engineering', 'LinkedIn','2025-08-20','2025-12-20',
     'Seattle', 4, 'Internship', 3000, 'https://linkedin.com', 'miles1'),

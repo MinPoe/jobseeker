@@ -8,10 +8,15 @@ jobseeker-backend/.idea
 jobseeker-backend/gradle
 jobseeker-backend/HELP.md
 jobseeker-backend/*.iml
+jobseeker-backend/src/main/java/com/board/jobseeker/resources/static
 
 # General
 .DS_Store
 *.log
-.env
 .vscode/
 .idea/
+
+# environmental variables
+.env
+*.env
+!.env.example

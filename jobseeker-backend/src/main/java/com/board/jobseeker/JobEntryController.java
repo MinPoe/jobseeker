@@ -74,12 +74,12 @@ public class JobEntryController {
     ///     response body - location header field of resource created 
     @PostMapping
     private ResponseEntity<Void> createJobEntry(@RequestBody JobEntry createdEntry, UriComponentsBuilder ucb, Principal principal) { 
-        JobEntry jobEntry_withOwner = new JobEntry(createdEntry.jobName(), createdEntry.companyName(), createdEntry.postDate(), createdEntry.closeDate(), createdEntry.jobLocation(), createdEntry.jobDuration(), createdEntry.jobType(), createdEntry.jobPay(), createdEntry.jobLink(), null, principal.getName()); 
+        JobEntry jobEntry_withOwner = new JobEntry(createdEntry.getJobName(), createdEntry.getCompanyName(), createdEntry.getPostDate(), createdEntry.getCloseDate(), createdEntry.getJobLocation(), createdEntry.getJobDuration(), createdEntry.getJobType(), createdEntry.getJobPay(), createdEntry.getJobLink(), null, principal.getName()); 
         JobEntry postedEntry = jobEntryRepository.save(jobEntry_withOwner); 
 
         URI postLocation = ucb
                 .path("api/{jobID}")
-                .buildAndExpand(postedEntry.jobID())
+                .buildAndExpand(postedEntry.getJobID())
                 .toUri();
         return ResponseEntity.created(postLocation).build();
     }
@@ -113,9 +113,8 @@ public class JobEntryController {
         JobEntry jobEntry = jobEntryRepository.findByJobIDAndOwner(requestedID, principal.getName()); 
 
         if (jobEntry != null) {
-            JobEntry updatedJobEntry = new JobEntry(update.jobName(), update.companyName(), update.postDate(), update.closeDate(), update.jobLocation(), update.jobDuration(), update.jobType(), update.jobPay(), update.jobLink(), jobEntry.jobID(), principal.getName()); 
+            JobEntry updatedJobEntry = new JobEntry(update.getJobName(), update.getCompanyName(), update.getPostDate(), update.getCloseDate(), update.getJobLocation(), update.getJobDuration(), update.getJobType(), update.getJobPay(), update.getJobLink(), jobEntry.getJobID(), principal.getName()); 
             jobEntryRepository.save(updatedJobEntry); 
-
             return ResponseEntity.noContent().build();
         }
 

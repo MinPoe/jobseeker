@@ -18,25 +18,45 @@ repositories {
 }
 
 dependencies {
+	// JSON 
 	implementation 'com.github.java-json-tools:json-patch:1.13'
 	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
+	// basics 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	// testing 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'com.h2database:h2'
+	// template engine for visual testing 
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 	// needed for tests to support HTTP PATCH method 
 	testImplementation 'org.apache.httpcomponents.client5:httpclient5'
 	
+	// JDBC, JPA
 	implementation 'org.springframework.data:spring-data-jdbc'
-    implementation 'com.h2database:h2'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// PostgreSQL
+    runtimeOnly 'org.postgresql:postgresql:42.7.3'
+
+	// security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	// handle LocalDate type
 	implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
 
-	// template engine for visual testing 
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// configuration processing 
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
 }
 
 tasks.named('test') {
@@ -48,10 +68,10 @@ test {
     testLogging {
         events "passed", "skipped", "failed" //, "standardOut", "standardError"
 
-        showExceptions true
-        exceptionFormat "full"
-        showCauses true
-        showStackTraces true
+        showExceptions = true
+        exceptionFormat ="full"
+        showCauses = true
+        showStackTraces = true
 
         // verbose test output
         showStandardStreams = true

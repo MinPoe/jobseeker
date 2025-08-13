@@ -19,6 +19,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
+import org.springframework.test.context.ActiveProfiles;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,6 +31,7 @@ import java.net.URI;
 	// start Spring boot application to allow for testing 
 	webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@ActiveProfiles("test")
 class JobseekerAPITests {
 	// dependency injection (autowired) for test helper to aid in HTTP request creation 
 	@Autowired 
@@ -274,7 +277,7 @@ class JobseekerAPITests {
 		
 		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-		assertThat(getResponse.getBody().jobName()).isEqualTo("Updated Job Name"); 
+		assertThat(getResponse.getBody().getJobName()).isEqualTo("Updated Job Name"); 
 	}
 
 	/// Request Type : DELETE 

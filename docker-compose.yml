@@ -1,0 +1,99 @@
+version: '3.8'
+
+# container definitions
+services:
+  # database service
+  postgres:
+    image: postgres:17
+    container_name: jobseeker_postgres
+    
+    environment:
+      POSTGRES_DB: jobseekerdb          # database named "jobseekerdb"
+      POSTGRES_USER: ${DATABASE_USERNAME}   # user from environment variable
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}    # password from environment variable
+    
+    # Port mapping: host_port:container_port
+    # maps port 5432 on local computer to port 5432 inside container
+    ports:
+      - "5432:5432"
+    
+    # persist data even when container stops
+    volumes:
+      # Named volume: store database data permanently
+      - postgres_data:/var/lib/postgresql/data
+      # run init script when database starts
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    
+    # Health check: Docker tests if PostgreSQL is ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d jobseekerdb"]  # test command
+      interval: 10s     # every 10 seconds
+      timeout: 5s       # wait 5 seconds for response
+      retries: 5        # try 5 times before marking as unhealthy
+    
+    # put this service on custom network
+    networks:
+      - jobseeker-network
+
+  # Backend service (jobseeker-backend)
+  jobseeker-backend:
+    # build config 
+    build: 
+      context: ./jobseeker-backend
+      dockerfile: Dockerfile
+    
+    container_name: jobseeker_backend
+    ports:
+      - "${SERVER_PORT:-8080}:8080"   # local computer's 8080 → container's 8080
+    
+    # Postgres must pass health check, otherwise backend doesn't start
+    depends_on:
+      postgres:
+        condition: service_healthy 
+    
+    environment:
+      # tell Spring to use "docker" profile (different config)
+      - SPRING_PROFILES_ACTIVE=docker
+      
+      # DB configs (using environment variables)
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/jobseekerdb
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      
+      # JWT secret (from environment variable)
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS}
+      
+      # Server Configuration
+      - SERVER_PORT=${SERVER_PORT:-8080}
+      
+      # Hibernate Settings
+      - HIBERNATE_DDL_AUTO=${HIBERNATE_DDL_AUTO:-update}
+      - SHOW_SQL=${SHOW_SQL:-false}
+      - FORMAT_SQL=${FORMAT_SQL:-false}
+      
+      # Logging Configuration
+      - LOG_LEVEL_APP=${LOG_LEVEL_APP:-INFO}
+      - LOG_LEVEL_SECURITY=${LOG_LEVEL_SECURITY:-WARN}
+      - LOG_LEVEL_HIBERNATE=${LOG_LEVEL_HIBERNATE:-WARN}
+      
+      # CORS config (from environment variables)
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      - CORS_ALLOWED_HEADERS=${CORS_ALLOWED_HEADERS:-Content-Type,Authorization,X-Requested-With}
+      - CORS_ALLOW_CREDENTIALS=${CORS_ALLOW_CREDENTIALS:-true}
+    
+    networks:
+      - jobseeker-network
+    
+    # restart policy: restart unless manually stopped
+    restart: unless-stopped
+
+  # TODO: implement DBeaver management tool 
+
+volumes:
+  postgres_data:    # PostgreSQL database files
+
+# Custom network: allows containers to talk to each other by name
+networks:
+  jobseeker-network:
+    driver: bridge    # bridge network type
