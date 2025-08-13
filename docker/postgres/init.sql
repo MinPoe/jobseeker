@@ -17,14 +17,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- VALUES ('admin', 'admin@jobseeker.com', '$2a$10$...', NOW());
 
 -- permission grants
-GRANT ALL PRIVILEGES ON DATABASE jobseekerdb TO secret-regulator;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO secret-regulator;
+GRANT ALL PRIVILEGES ON DATABASE jobseekerdb TO "secret-regulator";
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "secret-regulator";
 
 -- for auto-increment IDs
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO secret-regulator;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO "secret-regulator";
 
 -- future tables/sequences
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO secret-regulator;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO secret-regulator;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO "secret-regulator";
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO "secret-regulator";
 
 \echo 'Database initialization completed successfully!'

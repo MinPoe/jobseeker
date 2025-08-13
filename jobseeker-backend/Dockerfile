@@ -1,5 +1,5 @@
 # base image
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 
 # WORKING DIRECTORY: where commands will run inside container, will create if doesn't exist
 WORKDIR /app

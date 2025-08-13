@@ -19,16 +19,16 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     // Inject test user credentials from environment variables
-    @Value("${test.user.poster.username}")
+    @Value("${test.user.poster.username:#{null}}")
     private String jobPosterUsername;
     
-    @Value("${test.user.poster.password}")
+    @Value("${test.user.poster.password:#{null}}")
     private String jobPosterPassword;
     
-    @Value("${test.user.seeker.username}")
+    @Value("${test.user.seeker.username:#{null}}")
     private String jobSeekerUsername;
     
-    @Value("${test.user.seeker.password}")
+    @Value("${test.user.seeker.password:#{null}}")
     private String jobSeekerPassword;
 
     // @Bean - expect a bean to config filter chain
@@ -52,7 +52,7 @@ public class SecurityConfig {
 
    // all API tests that make a HTTP request will use this example user to authenticate 
    @Bean 
-   @Profile({"dev", "docker", "test"})
+   @Profile({"dev", "test"})
    UserDetailsService testOnlyUsers(PasswordEncoder passwordEncoder) {
     User.UserBuilder users = User.builder(); 
     // jobPoster is a company job poster 
@@ -69,5 +69,12 @@ public class SecurityConfig {
         .roles("JOB-SEEKER")
         .build(); 
     return new InMemoryUserDetailsManager(jobPoster, jobSeeker); 
+   }
+
+   // when initially setting up the database in production, create master users 
+   @Bean 
+   @Profile({"docker", "prod"}) 
+   UserDetailsService masterUsers() {
+        return new InMemoryUserDetailsManager(); 
    }
 }

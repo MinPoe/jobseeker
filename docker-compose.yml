@@ -1,5 +1,3 @@
-version: '3.8'
-
 # container definitions
 services:
   # database service
@@ -56,9 +54,10 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       
       # DB configs (using environment variables)
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/jobseekerdb
-      - DATABASE_USERNAME=${DATABASE_USERNAME}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/jobseekerdb
+      - SPRING_DATASOURCE_USERNAME=${DATABASE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       
       # JWT secret (from environment variable)
       - JWT_SECRET=${JWT_SECRET}
