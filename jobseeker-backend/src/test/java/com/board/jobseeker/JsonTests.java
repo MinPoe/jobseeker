@@ -1,5 +1,6 @@
 package com.board.jobseeker;
 
+import com.board.jobseeker.jobs.JobEntry;
 import org.assertj.core.util.Arrays; 
 import org.junit.jupiter.api.BeforeEach; 
 import org.junit.jupiter.api.Test;

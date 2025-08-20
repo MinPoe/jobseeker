@@ -1,4 +1,4 @@
-package com.board.jobseeker;
+package com.board.jobseeker.jobs;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

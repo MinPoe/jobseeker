@@ -11,5 +11,3 @@ VALUES
     (22, 'Hardware Testing', 'Intel', '2025-04-30', '2025-08-30',
     'Vancouver', 4, 'Part-Time', 5000, 'https://intel.careers.com', 'peter2')
     ;
-
-

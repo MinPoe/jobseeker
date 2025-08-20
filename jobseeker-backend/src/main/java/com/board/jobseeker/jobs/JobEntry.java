@@ -1,4 +1,4 @@
-package com.board.jobseeker;
+package com.board.jobseeker.jobs;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -10,17 +10,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 
 /// The JobEntry data type will store:
-/// jobName - the name of the job position
-/// companyName - the name of the company posting the job
-/// postDate - the date at which the company posted the job
-/// closeDate - the date at which the job application closes (OPTIONAL, some may not have)
-/// jobLocation - job location
-/// jobDuration - how long the job is (e.g. for internships), 0 for not specified (full-time)
-/// jobType - "Internship", "Part-time", "Full-time" 
-/// jobPay - compensation that the job provides per month (TENTATIVE)
-/// jobLink - link to job application
-/// jobID - unique numeric identifier for each job 
-/// owner - user account that posted the job, thereby having access to modifications
+    /// jobName - the name of the job position
+    /// companyName - the name of the company posting the job
+    /// postDate - the date at which the company posted the job
+    /// closeDate - the date at which the job application closes (OPTIONAL, some may not have)
+    /// jobLocation - job location
+    /// jobDuration - how long the job is (e.g. for internships), 0 for not specified (full-time)
+    /// jobType - "Internship", "Part-time", "Full-time" 
+    /// jobPay - compensation that the job provides per month (TENTATIVE)
+    /// jobLink - link to job application
+    /// jobID - unique numeric identifier for each job 
+    /// owner - user account that posted the job, thereby having access to modifications
 @Entity
 public class JobEntry {
     @Id
